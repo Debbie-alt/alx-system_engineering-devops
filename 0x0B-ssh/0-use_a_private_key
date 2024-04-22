@@ -1,1 +1,2 @@
+#!/usr/bin/env bash
 ssh ubuntu@54.87.208.134
