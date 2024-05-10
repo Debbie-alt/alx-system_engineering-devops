@@ -30,4 +30,4 @@ if sudo ufw status | grep -q "80/tcp"; then
     # Allow incoming traffic on port 80
     echo "Allowing incoming traffic on port 80..."
     sudo ufw allow 80/tcp
-fi 
+fi
