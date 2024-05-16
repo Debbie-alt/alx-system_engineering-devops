@@ -1,2 +1,2 @@
 ## Mysql
-Using mysql database in web servers
+Using mysql database in web serverrs
