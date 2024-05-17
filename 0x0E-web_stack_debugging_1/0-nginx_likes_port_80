@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
+# This script installs Nginx and configures it to listen on port 80 on all IPv4 and IPv6 IPs
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
 # Update package lists
 apt-get update
 
-# Install Nginx
+# Install Nginx if not already installed
 apt-get install -y nginx
 
-# Configure Nginx to listen on port 80 on all IPv4 IPs
-cat > /etc/nginx/sites-available/default <<EOL
+# Configure Nginx to listen on port 80 on all IPv4 and IPv6 IPs
+cat > /etc/nginx/sites-available/default << 'EOL'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -17,7 +22,7 @@ server {
     index index.html index.htm index.nginx-debian.html;
 
     location / {
-        try_files \$uri \$uri/ =404;
+        try_files $uri $uri/ =404;
     }
 }
 EOL
@@ -25,11 +30,9 @@ EOL
 # Restart Nginx to apply the configuration
 service nginx restart
 
-# Ensure Nginx is enabled to start on boot (container environments typically handle this differently)
-# This line might not be necessary in a container, but is included for completeness
-# This command may not work in all container environments and can be commented out if not needed
-# update-rc.d nginx defaults
+# Ensure Nginx is enabled to start on boot
+update-rc.d nginx defaults
 
 # Confirm Nginx is running and listening on port 80
 service nginx status
-netstat -tuln | grep :80
+netstat -tuln | grep ':80'
