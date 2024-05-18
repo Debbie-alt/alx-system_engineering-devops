@@ -27,3 +27,7 @@ update-rc.d nginx defaults
 # Confirm Nginx is running and listening on port 80
 service nginx status
 netstat -tuln | grep ':80'
+
+#displays the default page
+
+curl http://localhost:80
