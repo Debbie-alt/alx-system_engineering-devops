@@ -1,45 +1,37 @@
 #!/usr/bin/python3
-
 """
-This script queries the Reddit API and prints the titles of the top 10 hot posts 
-from a given subreddit.
-
-Requirements:
-- requests library
+Script to print hot posts on a given Reddit subreddit.
 """
 
 import requests
 
+
 def top_ten(subreddit):
-  """Prints titles of the top 10 hot posts from a subreddit.
+    """Print the titles of the 10 hottest posts on a given subreddit."""
+    # Construct the URL for the subreddit's hot posts in JSON format
+    url = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
 
-  Args:
-    subreddit: The name of the subreddit to query (string).
+    # Define headers for the HTTP request, including User-Agent
+    headers = {
+        "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/bdov_)"
+    }
 
-  Returns:
-    None if subreddit is invalid, otherwise prints titles.
-  """
-  # Base URL for Reddit API endpoint
-  url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
+    # Define parameters for the request, limiting the number of posts to 10
+    params = {
+        "limit": 10
+    }
 
-  # Make the request without following redirects
-  response = requests.get(url, allow_redirects=False)
+    # Send a GET request to the subreddit's hot posts page
+    response = requests.get(url, headers=headers, params=params,
+                            allow_redirects=False)
 
-  # Check for successful response (200 OK)
-  if response.status_code == 200:
-    # Parse the JSON data
-    data = response.json()
-    
-    # Check for valid data structure (avoid following potential redirects)
-    if data.get('data') and data['data'].get('children'):
-      # Extract titles of the top 10 posts
-      for post in data['data']['children'][:10]:
-        print(post['data']['title'])
-    else:
-      print("Subreddit may be invalid or private.")
-  else:
-    print(f"Error: {response.status_code}")
+    # Check if the response status code indicates a not-found error (404)
+    if response.status_code == 404:
+        print("None")
+        return
 
-# Example usage
-subreddit = "python"
-top_ten(subreddit)
+    # Parse the JSON response and extract the 'data' section
+    results = response.json().get("data")
+
+    # Print the titles of the top 10 hottest posts
+    [print(c.get("data").get("title")) for c in results.get("children")]
