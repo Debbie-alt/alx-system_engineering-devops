@@ -1,40 +1,45 @@
 #!/usr/bin/python3
+
 """
-Function that queries the Reddit API and returns the top ten hot posts for a given subreddit.
-If an invalid subreddit is given, the function should return None.
+This script queries the Reddit API and prints the titles of the top 10 hot posts 
+from a given subreddit.
+
+Requirements:
+- requests library
 """
 
 import requests
-from sys import argv
-
 
 def top_ten(subreddit):
-    """
-    Returns the top ten posts for a given subreddit
-    """
-    user = {'User-Agent': 'Mozilla/5.0'}
-    url = "https://www.reddit.com/r/{}/hot/.json?limit=10".format(subreddit)
-    response = requests.get(url, headers=user, allow_redirects=False)
+  """Prints titles of the top 10 hot posts from a subreddit.
 
-    if response.status_code != 200:
-        print(None)
-        return
+  Args:
+    subreddit: The name of the subreddit to query (string).
 
-    try:
-        data = response.json()
-        posts = data.get('data', {}).get('children', [])
-        if not posts:
-            print(None)
-            return
+  Returns:
+    None if subreddit is invalid, otherwise prints titles.
+  """
+  # Base URL for Reddit API endpoint
+  url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
 
-        for post in posts:
-            print(post.get('data', {}).get('title'))
-    except Exception:
-        print(None)
+  # Make the request without following redirects
+  response = requests.get(url, allow_redirects=False)
 
-
-if __name__ == "__main__":
-    if len(argv) > 1:
-        top_ten(argv[1])
+  # Check for successful response (200 OK)
+  if response.status_code == 200:
+    # Parse the JSON data
+    data = response.json()
+    
+    # Check for valid data structure (avoid following potential redirects)
+    if data.get('data') and data['data'].get('children'):
+      # Extract titles of the top 10 posts
+      for post in data['data']['children'][:10]:
+        print(post['data']['title'])
     else:
-        print("Please provide a subreddit name.")
+      print("Subreddit may be invalid or private.")
+  else:
+    print(f"Error: {response.status_code}")
+
+# Example usage
+subreddit = "python"
+top_ten(subreddit)
